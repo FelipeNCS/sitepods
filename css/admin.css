@@ -976,3 +976,59 @@ body.admin-body {
         padding-right: 0;
     }
 }
+
+/* Helper class to hide elements */
+.hidden {
+    display: none !important;
+}
+
+/* Push configuration tabs to the right of the header nav bar */
+.dash-nav {
+    flex-grow: 1;
+    margin: 0 45px;
+}
+
+.nav-tab[data-tab="tab-produtos"] {
+    margin-left: auto;
+}
+
+/* Elegant minimalist site config sidebar buttons with premium transition effects */
+.config-sidebar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: rgba(13, 13, 18, 0.6);
+    border: 1px solid rgba(255, 0, 60, 0.2);
+    color: #8a8a93;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 14px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: inset 0 0 0 rgba(255, 0, 60, 0);
+}
+
+.config-sidebar-btn:hover {
+    color: #ffffff;
+    border-color: rgba(255, 0, 60, 0.6);
+    background: rgba(255, 0, 60, 0.08);
+    box-shadow: 
+        0 0 10px rgba(255, 0, 60, 0.35),
+        inset 0 0 8px rgba(255, 0, 60, 0.1);
+    transform: translateY(-1px);
+}
+
+.config-sidebar-btn.active {
+    color: #ffffff;
+    background: linear-gradient(90deg, rgba(255, 0, 60, 0.15) 0%, rgba(255, 51, 102, 0.25) 100%);
+    border-color: #ff003c;
+    box-shadow: 
+        0 0 15px rgba(255, 0, 60, 0.5),
+        inset 0 0 10px rgba(255, 0, 60, 0.2);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+}

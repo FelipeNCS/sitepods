@@ -34,6 +34,7 @@
                 <button class="nav-tab" data-tab="tab-fiados">⏳ PRODUTOS FIADOS</button>
                 <button class="nav-tab" data-tab="tab-vista">💵 VENDAS À VISTA</button>
                 <button class="nav-tab" data-tab="tab-clientes">👥 CLIENTES</button>
+                <button class="nav-tab" data-tab="tab-alerta-venda">🔔 ALERTA DE VENDA</button>
                 <button class="nav-tab" data-tab="tab-produtos">⚙️ CONFIGURAÇÃO DO SITE</button>
                 <button class="nav-tab" data-tab="tab-config">👤 NOVO ADMIN</button>
             </nav>
@@ -206,81 +207,107 @@
                     </div>
                 </section>
 
-                <!-- TAB 5: CONFIGURAÇÃO DO SITE -->
+                <!-- TAB: ALERTA DE VENDA -->
+                <section id="tab-alerta-venda" class="tab-panel">
+                    <div class="table-container pixel-border-single">
+                        <h2 class="section-title">> PEDIDOS RECEBIDOS VIA WHATSAPP (ALERTAS DE VENDA)</h2>
+                        <p class="form-subtitle" style="margin-bottom: 15px; font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--text-secondary); text-align: left;">
+                            Gerencie os pedidos enviados pelos clientes através do WhatsApp. Clique em 📦 para converter em venda ou ❌ para descartar o alerta.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="pixel-table">
+                                <thead>
+                                    <tr>
+                                        <th>DATA / HORA</th>
+                                        <th>ITENS DO PEDIDO</th>
+                                        <th>VALOR TOTAL</th>
+                                        <th style="text-align: center;">AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-whatsapp-orders-tab">
+                                    <tr>
+                                        <td colspan="4" class="text-center">Nenhum pedido pendente.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                        <!-- TAB 5: CONFIGURAÇÃO DO SITE -->
                 <section id="tab-produtos" class="tab-panel">
-                    <!-- Subpainel 1: Cadastro de Produtos e Estoque -->
-                    <div id="subpanel-produtos">
-                        <div class="admin-grid-products">
-                            <!-- Left Column: Add Product -->
-                            <div class="glass-form-card pixel-border-single" style="text-align: left;">
-                                <h2 class="section-title">> ADICIONAR NOVO POD</h2>
-                                
-                                <form id="add-product-form">
-                                    <div class="form-group" style="margin-bottom: 15px;">
-                                        <label for="prod-name">NOME DO POD *</label>
-                                        <input type="text" id="prod-name" placeholder="Ex: Elf Bar BC5000" required>
-                                    </div>
-                                    
-                                    <div class="form-group" style="margin-bottom: 15px;">
-                                        <label for="prod-model">MODELO / CATEGORIA *</label>
-                                        <input type="text" id="prod-model" placeholder="Ex: 5000 Puffs" required>
-                                    </div>
-                                    
-                                    <div class="form-row" style="margin-bottom: 15px;">
-                                        <div class="form-group">
-                                            <label for="prod-price">PREÇO (R$) *</label>
-                                            <input type="number" id="prod-price" placeholder="89.90" step="0.01" min="0" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="prod-quantity">ESTOQUE INICIAL *</label>
-                                            <input type="number" id="prod-quantity" placeholder="15" min="0" required>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group" style="margin-bottom: 15px;">
-                                        <label for="prod-desc">DESCRIÇÃO</label>
-                                        <textarea id="prod-desc" style="height: 80px; resize: none;" placeholder="Descreva sabor e características..."></textarea>
-                                    </div>
-                                    
-                                    <div class="form-group" style="margin-bottom: 20px;">
-                                        <label>IMAGEM DO PRODUTO</label>
-                                        <div class="image-upload-wrapper" id="image-upload-area">
-                                            <input type="file" id="image-file-input" accept="image/*" style="display: none;">
-                                            <div class="upload-icon">📷</div>
-                                            <p class="upload-text" id="upload-instruction">Arraste aqui ou <span>clique para buscar</span></p>
-                                            <img src="" alt="Preview" class="image-preview" id="image-preview-el" style="display: none;">
-                                        </div>
-                                    </div>
-                                    
-                                    <button type="submit" class="pixel-btn success-glow" style="width: 100%;" id="btn-add-product">CADASTRAR PRODUTO</button>
-                                </form>
-                            </div>
+                    <!-- Subpainel 1: Gerenciamento de Estoque -->
+                    <div id="subpanel-estoque">
+                        <div class="admin-list-card pixel-border-single" style="max-width: 1000px; margin: 0 auto;">
+                            <h2 class="section-title">> GERENCIAMENTO DE ESTOQUE</h2>
                             
-                            <!-- Right Column: Products List & Stock Manager -->
-                            <div class="admin-list-card pixel-border-single">
-                                <h2 class="section-title">> GERENCIAMENTO DE ESTOQUE</h2>
-                                
-                                <div class="table-responsive">
-                                    <table class="pixel-table">
-                                        <thead>
-                                            <tr>
-                                                <th>PRODUTO</th>
-                                                <th>MODELO</th>
-                                                <th>PREÇO</th>
-                                                <th style="width: 150px;">ESTOQUE</th>
-                                                <th style="text-align: center;">AÇÕES</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="admin-products-table-body">
-                                            <!-- Loaded dynamically -->
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div class="table-responsive">
+                                <table class="pixel-table">
+                                    <thead>
+                                        <tr>
+                                            <th>PRODUTO</th>
+                                            <th>MODELO</th>
+                                            <th>PREÇO</th>
+                                            <th style="width: 150px;">ESTOQUE</th>
+                                            <th style="text-align: center;">AÇÕES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-products-table-body">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Subpainel 2: Lançar Promoção -->
+                    <!-- Subpainel 2: Cadastro de Produtos -->
+                    <div id="subpanel-produtos" class="hidden" style="max-width: 600px; margin: 0 auto;">
+                        <div class="glass-form-card pixel-border-single" style="text-align: left;">
+                            <h2 class="section-title">> ADICIONAR NOVO POD</h2>
+                            
+                            <form id="add-product-form">
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="prod-name">NOME DO POD *</label>
+                                    <input type="text" id="prod-name" placeholder="Ex: Elf Bar BC5000" required>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="prod-model">MODELO / CATEGORIA *</label>
+                                    <input type="text" id="prod-model" placeholder="Ex: 5000 Puffs" required>
+                                </div>
+                                
+                                <div class="form-row" style="margin-bottom: 15px;">
+                                    <div class="form-group">
+                                        <label for="prod-price">PREÇO (R$) *</label>
+                                        <input type="number" id="prod-price" placeholder="89.90" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prod-quantity">ESTOQUE INICIAL *</label>
+                                        <input type="number" id="prod-quantity" placeholder="15" min="0" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="prod-desc">DESCRIÇÃO</label>
+                                    <textarea id="prod-desc" style="height: 80px; resize: none;" placeholder="Descreva sabor e características..."></textarea>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 20px;">
+                                    <label>IMAGEM DO PRODUTO</label>
+                                    <div class="image-upload-wrapper" id="image-upload-area">
+                                        <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+                                        <div class="upload-icon">📷</div>
+                                        <p class="upload-text" id="upload-instruction">Arraste aqui ou <span>clique para buscar</span></p>
+                                        <img src="" alt="Preview" class="image-preview" id="image-preview-el" style="display: none;">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="pixel-btn success-glow" style="width: 100%;" id="btn-add-product">CADASTRAR PRODUTO</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Subpainel 3: Lançar Promoção -->
                     <div id="subpanel-promocao" class="hidden" style="max-width: 600px; margin: 0 auto;">
                         <div class="glass-form-card pixel-border-single" style="text-align: left;">
                             <h2 class="section-title">> CONFIGURAÇÕES DE PROMOÇÃO</h2>
@@ -387,8 +414,9 @@
                 <div id="config-sidebar" class="hidden">
                     <div class="sidebar-card pixel-border-single">
                         <h3 class="sidebar-card-title">CONFIGURAÇÃO DO SITE</h3>
-                        <button class="config-sidebar-btn active" id="btn-opt-produtos">> CADASTRAR PRODUTO</button>
-                        <button class="config-sidebar-btn" id="btn-opt-promocao">> LANÇAR PROMOÇÃO</button>
+                        <button class="config-sidebar-btn active" id="btn-opt-estoque">📦 GERENCIAR ESTOQUE</button>
+                        <button class="config-sidebar-btn" id="btn-opt-produtos">⚙️ CADASTRAR PRODUTO</button>
+                        <button class="config-sidebar-btn" id="btn-opt-promocao">📢 LANÇAR PROMOÇÃO</button>
                     </div>
                 </div>
             </aside>
@@ -468,36 +496,6 @@
                     <button type="button" id="btn-cancel-edit" class="pixel-btn-danger">CANCELAR</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- MODAL DE PEDIDOS WHATSAPP -->
-    <div id="whatsapp-orders-modal" class="modal-overlay hidden">
-        <div class="modal-content pixel-border-double" style="max-width: 700px; width: 90%;">
-            <h2 class="section-title">> PEDIDOS RECEBIDOS (WHATSAPP)</h2>
-            <p class="form-subtitle" style="margin-bottom: 15px; font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--text-secondary);">
-                Clique em 📦 para transferir o pedido ao formulário de vendas ou ❌ para excluir.
-            </p>
-            <div class="table-responsive" style="margin-top: 15px; max-height: 350px; overflow-y: auto;">
-                <table class="pixel-table">
-                    <thead>
-                        <tr>
-                            <th>DATA / HORA</th>
-                            <th>ITENS DO PEDIDO</th>
-                            <th>TOTAL</th>
-                            <th style="text-align: center;">AÇÕES</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body-whatsapp-orders">
-                        <tr>
-                            <td colspan="4" class="text-center">Nenhum pedido pendente.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="form-actions" style="margin-top: 20px;">
-                <button type="button" id="btn-close-whatsapp-modal" class="pixel-btn-danger">FECHAR</button>
-            </div>
         </div>
     </div>
 

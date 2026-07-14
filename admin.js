@@ -18,20 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
         loadWhatsAppOrders(true); // silent load
     }, 10000);
 
-    // Ouvintes para o Modal de Pedidos WhatsApp
+    // Ouvinte para o Alerta de Venda no Sidebar (Redireciona para a aba Alerta de Venda)
     const salesAlertBox = document.getElementById('stat-sales-alert-box');
-    const whatsappModal = document.getElementById('whatsapp-orders-modal');
-    const btnCloseWhatsappModal = document.getElementById('btn-close-whatsapp-modal');
-
-    if (salesAlertBox && whatsappModal) {
+    if (salesAlertBox) {
         salesAlertBox.addEventListener('click', () => {
-            loadWhatsAppOrders();
-            whatsappModal.classList.remove('hidden');
-        });
-    }
-    if (btnCloseWhatsappModal && whatsappModal) {
-        btnCloseWhatsappModal.addEventListener('click', () => {
-            whatsappModal.classList.add('hidden');
+            const alertTab = document.querySelector('.nav-tab[data-tab="tab-alerta-venda"]');
+            if (alertTab) alertTab.click();
         });
     }
 
@@ -167,9 +159,9 @@ function initTabs() {
                     defaultSidebar.classList.add('hidden');
                     configSidebar.classList.remove('hidden');
                     
-                    // Trigger click on Cadastrar Produto default subpanel option
-                    const btnOptProd = document.getElementById('btn-opt-produtos');
-                    if (btnOptProd) btnOptProd.click();
+                    // Trigger click on Gerenciar Estoque default subpanel option
+                    const btnOptEstoque = document.getElementById('btn-opt-estoque');
+                    if (btnOptEstoque) btnOptEstoque.click();
                 } else {
                     defaultSidebar.classList.remove('hidden');
                     configSidebar.classList.add('hidden');
@@ -179,23 +171,38 @@ function initTabs() {
     });
 
     // Wire up site settings option buttons
+    const btnOptEstoque = document.getElementById('btn-opt-estoque');
     const btnOptProd = document.getElementById('btn-opt-produtos');
     const btnOptPromo = document.getElementById('btn-opt-promocao');
+    const subpanelEstoque = document.getElementById('subpanel-estoque');
     const subpanelProd = document.getElementById('subpanel-produtos');
     const subpanelPromo = document.getElementById('subpanel-promocao');
 
-    if (btnOptProd && btnOptPromo && subpanelProd && subpanelPromo) {
+    if (btnOptEstoque && btnOptProd && btnOptPromo && subpanelEstoque && subpanelProd && subpanelPromo) {
+        btnOptEstoque.addEventListener('click', () => {
+            btnOptEstoque.classList.add('active');
+            btnOptProd.classList.remove('active');
+            btnOptPromo.classList.remove('active');
+            subpanelEstoque.classList.remove('hidden');
+            subpanelProd.classList.add('hidden');
+            subpanelPromo.classList.add('hidden');
+        });
+
         btnOptProd.addEventListener('click', () => {
             btnOptProd.classList.add('active');
+            btnOptEstoque.classList.remove('active');
             btnOptPromo.classList.remove('active');
             subpanelProd.classList.remove('hidden');
+            subpanelEstoque.classList.add('hidden');
             subpanelPromo.classList.add('hidden');
         });
 
         btnOptPromo.addEventListener('click', () => {
             btnOptPromo.classList.add('active');
+            btnOptEstoque.classList.remove('active');
             btnOptProd.classList.remove('active');
             subpanelPromo.classList.remove('hidden');
+            subpanelEstoque.classList.add('hidden');
             subpanelProd.classList.add('hidden');
             loadPromoSettings(); // load promo configuration on demand
         });
@@ -1198,7 +1205,7 @@ function initSmokeCanvas() {
 let whatsappOrders = [];
 
 async function loadWhatsAppOrders(silent = false) {
-    const tableBody = document.getElementById('table-body-whatsapp-orders');
+    const tableBody = document.getElementById('table-body-whatsapp-orders-tab');
     const alertLabel = document.getElementById('stat-sales-alert');
     if (!tableBody || !alertLabel) return;
 
@@ -1215,7 +1222,7 @@ async function loadWhatsAppOrders(silent = false) {
             alertLabel.classList.remove('blink');
         }
 
-        // Render modal table rows
+        // Render table rows inside tab
         if (whatsappOrders.length === 0) {
             tableBody.innerHTML = `<tr><td colspan="4" class="text-center">Nenhum pedido pendente.</td></tr>`;
         } else {
@@ -1293,10 +1300,6 @@ function registerSaleFromOrder(orderId, itemsArrayOrStr, total) {
         // Trigger live price calculate preview
         priceInput.dispatchEvent(new Event('input'));
     }
-
-    // Close WhatsApp modal
-    const whatsappModal = document.getElementById('whatsapp-orders-modal');
-    if (whatsappModal) whatsappModal.classList.add('hidden');
 
     // Switch to VENDER POD tab
     const venderTab = document.querySelector('.nav-tab[data-tab="tab-vender"]');

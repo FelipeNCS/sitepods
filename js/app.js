@@ -248,26 +248,36 @@ async function loadPromoBanner() {
 function renderPromoBanner(text) {
     if (document.getElementById('site-promo-banner')) return;
 
+    const bannerHeight = 40; // Height in pixels for the fixed banner
+
     const banner = document.createElement('div');
     banner.id = 'site-promo-banner';
     banner.style.background = 'linear-gradient(90deg, #7c3aed 0%, #06b6d4 50%, #7c3aed 100%)';
     banner.style.backgroundSize = '200% auto';
     banner.style.color = '#ffffff';
-    banner.style.textAlign = 'center';
-    banner.style.padding = '10px 20px';
-    banner.style.fontSize = '14px';
+    banner.style.fontSize = '13px';
     banner.style.fontWeight = 'bold';
     banner.style.letterSpacing = '1px';
     banner.style.textTransform = 'uppercase';
-    banner.style.position = 'relative';
+    banner.style.position = 'fixed';
+    banner.style.top = '0';
+    banner.style.left = '0';
+    banner.style.width = '100%';
+    banner.style.height = bannerHeight + 'px';
+    banner.style.display = 'flex';
+    banner.style.alignItems = 'center';
+    banner.style.justifyContent = 'center';
+    banner.style.boxSizing = 'border-box';
+    banner.style.padding = '0 40px 0 20px';
     banner.style.zIndex = '1001';
     banner.style.boxShadow = '0 2px 10px rgba(124, 58, 237, 0.4)';
     banner.style.animation = 'promoGrad 4s linear infinite, promoPulse 1.5s ease-in-out infinite alternate';
     banner.style.fontFamily = 'var(--font-primary)';
+    banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     
     banner.innerHTML = `
-        <span style="display: inline-block; vertical-align: middle; margin-right: 8px;">🔥</span>
-        <span style="vertical-align: middle;">${text}</span>
+        <span style="display: inline-block; margin-right: 8px;">🔥</span>
+        <span>${text}</span>
         <button id="close-promo-btn" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #fff; font-size: 16px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;">✕</button>
     `;
 
@@ -296,18 +306,25 @@ function renderPromoBanner(text) {
     // Adjust header and body padding
     const header = document.querySelector('header');
     if (header) {
-        header.style.top = banner.offsetHeight + 'px';
-        document.body.style.paddingTop = banner.offsetHeight + 'px';
+        header.style.transition = 'top 0.3s ease';
+        header.style.top = bannerHeight + 'px';
     }
+    document.body.style.transition = 'padding-top 0.3s ease';
+    document.body.style.paddingTop = bannerHeight + 'px';
 
     const closeBtn = banner.querySelector('#close-promo-btn');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
-            banner.remove();
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                banner.remove();
+            }, 300);
+            
             if (header) {
                 header.style.top = '0';
-                document.body.style.paddingTop = '0';
             }
+            document.body.style.paddingTop = '0';
         });
     }
 }
