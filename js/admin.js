@@ -274,6 +274,7 @@ function renderSalesTables() {
                         <div id="dropdown-${s.id}" class="pixel-dropdown-menu hidden">
                             <button class="dropdown-item btn-pay" onclick="paySale(${s.id})">✔ Recebido</button>
                             <button class="dropdown-item" onclick="openEditModal(${s.id})">✏ Editar</button>
+                            <button class="dropdown-item" onclick="changeSalePartner(${s.id})">👥 Mudar Sócio</button>
                             <button class="dropdown-item btn-delete" onclick="deleteSale(${s.id})">❌ Excluir</button>
                         </div>
                     </div>
@@ -299,7 +300,13 @@ function renderSalesTables() {
                 <td>R$ ${s.shipping.toFixed(2)}</td>
                 <td class="text-green" style="font-weight:700;">R$ ${total.toFixed(2)}</td>
                 <td style="text-align: center;">
-                    <button class="pixel-btn-small" onclick="deleteSale(${s.id})">❌ Excluir</button>
+                    <div class="pixel-dropdown">
+                        <button class="pixel-btn-dropdown" onclick="toggleDropdown(event, ${s.id})">⋮</button>
+                        <div id="dropdown-${s.id}" class="pixel-dropdown-menu hidden">
+                            <button class="dropdown-item" onclick="changeSalePartner(${s.id})">👥 Mudar Sócio</button>
+                            <button class="dropdown-item btn-delete" onclick="deleteSale(${s.id})">❌ Excluir</button>
+                        </div>
+                    </div>
                 </td>
             `;
             cashBody.appendChild(tr);
@@ -694,10 +701,19 @@ async function loadProducts(silent = false) {
         // 1. Popula datalist de sugestão de vendas
         datalist.innerHTML = '';
         storefrontProducts.forEach(prod => {
-            const opt = document.createElement('option');
-            const fullName = prod.model ? `${prod.model} - ${prod.name}` : prod.name;
-            opt.value = fullName;
-            datalist.appendChild(opt);
+            if (prod.model) {
+                const opt1 = document.createElement('option');
+                opt1.value = `${prod.model} - ${prod.name}`;
+                datalist.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = `${prod.model} ${prod.name}`;
+                datalist.appendChild(opt2);
+            }
+
+            const opt3 = document.createElement('option');
+            opt3.value = prod.name;
+            datalist.appendChild(opt3);
         });
 
         // Event listener para auto-completar preço
@@ -1069,4 +1085,41 @@ function initSmokeCanvas() {
     }
 
     animate();
+}
+
+// Auxiliar para transferir venda de sócio
+async function changeSalePartner(saleId) {
+    const sale = sales.find(s => s.id === saleId);
+    if (!sale) return;
+
+    const newPartner = prompt("Digite o nome do novo sócio (Lipe, Anna ou Leon):", sale.partner);
+    if (!newPartner) return;
+
+    const cleanName = newPartner.trim();
+    const validPartners = ["Lipe", "Anna", "Leon"];
+    const matched = validPartners.find(p => p.toLowerCase() === cleanName.toLowerCase());
+
+    if (!matched) {
+        showToast("Sócio inválido! Escolha entre Lipe, Anna ou Leon.", "error");
+        return;
+    }
+
+    const payload = { ...sale, partner: matched };
+
+    try {
+        const response = await fetch(`/api/admin/sales/${saleId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            showToast(`Venda transferida para ${matched}!`, "success");
+            loadSales();
+        } else {
+            showToast("Falha ao transferir venda.", "error");
+        }
+    } catch (err) {
+        showToast("Erro de conexão.", "error");
+    }
 }

@@ -79,17 +79,21 @@ module.exports = async (req, res) => {
             try {
                 const [products] = await pool.query('SELECT * FROM products');
                 for (const p of products) {
-                    let fullName = p.name;
-                    if (p.model && p.model.trim() !== '') {
-                        fullName = `${p.model} ${p.name}`;
-                    }
-
-                    const productQueryLower = product.toLowerCase();
-                    const match1 = productQueryLower === p.name.toLowerCase();
-                    const match2 = productQueryLower === fullName.toLowerCase();
-                    const match3 = productQueryLower.includes(p.name.toLowerCase());
-
-                    if (match1 || match2 || match3) {
+                    // Limpeza de caracteres especiais, espaços e hifens para comparação robusta
+                    const cleanSold = product.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+                    const cleanDbName = p.name.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+                    const cleanDbModel = (p.model || '').toLowerCase().replace(/[^a-z0-9]/g, ' ');
+                    
+                    const soldWords = cleanSold.split(/\s+/).filter(Boolean);
+                    const nameWords = cleanDbName.split(/\s+/).filter(Boolean);
+                    
+                    // Condições de Match:
+                    // 1. O nome vendido contém o nome do produto do banco
+                    // 2. Ou todas as palavras do nome do produto estão presentes no texto digitado
+                    const match1 = cleanSold.includes(cleanDbName);
+                    const match2 = nameWords.every(word => soldWords.includes(word));
+                    
+                    if (match1 || match2) {
                         if (p.quantity > 0) {
                             const newQty = p.quantity - 1;
                             await pool.query('UPDATE products SET quantity = ? WHERE id = ?', [newQty, p.id]);
