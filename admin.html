@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Gerenciamento - LIGA PODS</title>
+    <!-- Favicon da Aba do Navegador -->
+    <link rel="icon" type="image/jpeg" href="/img/logo.png">
+    <!-- Fonts Google: Orbitron, Rajdhani e Press Start 2P -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Estilos Específicos do Admin -->
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <!-- Background Canvas para Fumaça e Partículas -->
+    <canvas id="smokeCanvas"></canvas>
+
+    <!-- Retro Grid Floor (Fundo de grade 3D clássico) -->
+    <div class="retro-grid"></div>
+
+    <!-- PAINEL DE GERENCIAMENTO (Dashboard) -->
+    <div id="dashboard-screen" class="screen active">
+        <header class="dash-header pixel-border-bottom">
+            <div class="header-logo">
+                <span class="logo-text-small">LIGA PODS</span>
+                <span class="version-tag">ADMIN v2.0</span>
+            </div>
+            
+            <!-- Abas de Navegação -->
+            <nav class="dash-nav">
+                <button class="nav-tab active" data-tab="tab-vender">📦 VENDER POD</button>
+                <button class="nav-tab" data-tab="tab-fiados">⏳ PRODUTOS FIADOS</button>
+                <button class="nav-tab" data-tab="tab-vista">💵 VENDAS À VISTA</button>
+                <button class="nav-tab" data-tab="tab-clientes">👥 CLIENTES</button>
+                <button class="nav-tab" data-tab="tab-produtos">⚙️ PRODUTOS DA LOJA</button>
+                <button class="nav-tab" data-tab="tab-config">👤 NOVO ADMIN</button>
+            </nav>
+            
+            <button id="logout-btn" class="pixel-btn-logout">Logout</button>
+        </header>
+
+        <!-- LAYOUT DE DUAS COLUNAS: CONTEÚDO E SIDEBAR DE ESTATÍSTICAS -->
+        <div class="dash-main-layout">
+            <!-- CONTEÚDO DAS ABAS (Esquerda) -->
+            <main class="dash-content">
+                
+                <!-- TAB 1: VENDER POD -->
+                <section id="tab-vender" class="tab-panel active">
+                    <div class="form-container pixel-border-single">
+                        <h2 class="section-title">> REGISTRAR NOVA VENDA</h2>
+                        <form id="sale-form" autocomplete="off">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="product-name">NOME DO PRODUTO *</label>
+                                    <input type="text" id="product-name" list="products-datalist" placeholder="Ex: Ignite V50 Watermelon Ice" required>
+                                    <datalist id="products-datalist">
+                                        <!-- Will be loaded dynamically from existing storefront products -->
+                                    </datalist>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product-price">VALOR DO PRODUTO (R$) *</label>
+                                    <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-name">NOME DO CLIENTE *</label>
+                                    <input type="text" id="customer-name" placeholder="Ex: João Silva" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-contact">CONTATO (WHATSAPP/TELEFONE)</label>
+                                    <input type="text" id="customer-contact" placeholder="Ex: 47999999999">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="shipping-fee">VALOR DO FRETE (R$)</label>
+                                    <input type="number" id="shipping-fee" step="0.01" min="0" value="0.00" placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="partner-select">SÓCIO *</label>
+                                    <select id="partner-select" required>
+                                        <option value="Lipe" selected>Lipe</option>
+                                        <option value="Anna">Anna</option>
+                                        <option value="Leon">Leon</option>
+                                    </select>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <label class="pixel-checkbox-label">
+                                        <input type="checkbox" id="is-credit">
+                                        <span class="custom-checkbox"></span>
+                                        VENDA FIADA?
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Campos dinâmicos do Fiado -->
+                            <div id="credit-fields" class="form-row-credit hidden">
+                                <div class="form-group">
+                                    <label for="due-date">DATA DE PAGAMENTO *</label>
+                                    <input type="date" id="due-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="interest-rate">JUROS (%)</label>
+                                    <input type="number" id="interest-rate" min="0" max="100" value="0" placeholder="Ex: 10">
+                                    <div id="live-total-preview" class="live-preview-box">
+                                        Total com Juros: <span id="live-total-value">R$ 0,00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="pixel-btn success-glow">CONFIRMAR VENDA [ENTER]</button>
+                                <button type="reset" id="btn-reset-form" class="pixel-btn-danger">LIMPAR</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- TAB 2: PRODUTOS FIADOS -->
+                <section id="tab-fiados" class="tab-panel">
+                    <div class="table-container pixel-border-single">
+                        <h2 class="section-title">> PRODUTOS FIADOS (CONTROLE DE DÉBITOS)</h2>
+                        <div class="table-responsive">
+                            <table class="pixel-table">
+                                <thead>
+                                    <tr>
+                                        <th>CLIENTE</th>
+                                        <th>SÓCIO</th>
+                                        <th>PRODUTO</th>
+                                        <th>VALOR + FRETE</th>
+                                        <th>JUROS (%)</th>
+                                        <th>VALOR TOTAL</th>
+                                        <th>VENCIMENTO</th>
+                                        <th>STATUS</th>
+                                        <th>AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-credit">
+                                    <tr>
+                                        <td colspan="9" class="text-center">Nenhum registro encontrado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: VENDAS À VISTA -->
+                <section id="tab-vista" class="tab-panel">
+                    <div class="table-container pixel-border-single">
+                        <h2 class="section-title">> HISTÓRICO DE VENDAS À VISTA</h2>
+                        <div class="table-responsive">
+                            <table class="pixel-table">
+                                <thead>
+                                    <tr>
+                                        <th>DATA / HORA</th>
+                                        <th>SÓCIO</th>
+                                        <th>CLIENTE</th>
+                                        <th>PRODUTO</th>
+                                        <th>FRETE</th>
+                                        <th>VALOR TOTAL</th>
+                                        <th>AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-cash">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Nenhum registro encontrado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: CLIENTES -->
+                <section id="tab-clientes" class="tab-panel">
+                    <div class="table-container pixel-border-single">
+                        <h2 class="section-title">> BANCO DE CLIENTES</h2>
+                        <div class="table-responsive">
+                            <table class="pixel-table">
+                                <thead>
+                                    <tr>
+                                        <th>CLIENTE</th>
+                                        <th>CONTATO</th>
+                                        <th>COMPRAS REAIS</th>
+                                        <th>TOTAL COMPRADO</th>
+                                        <th>SALDO DEVEDOR</th>
+                                        <th>RELAÇÃO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-customers">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Nenhum cliente cadastrado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: GERENCIAR PODS DA LOJA -->
+                <section id="tab-produtos" class="tab-panel">
+                    <div class="admin-grid-products">
+                        <!-- Left Column: Add Product -->
+                        <div class="glass-form-card pixel-border-single" style="text-align: left;">
+                            <h2 class="section-title">> ADICIONAR NOVO POD</h2>
+                            
+                            <form id="add-product-form">
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="prod-name">NOME DO POD *</label>
+                                    <input type="text" id="prod-name" placeholder="Ex: Elf Bar BC5000" required>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="prod-model">MODELO / CATEGORIA *</label>
+                                    <input type="text" id="prod-model" placeholder="Ex: 5000 Puffs" required>
+                                </div>
+                                
+                                <div class="form-row" style="margin-bottom: 15px;">
+                                    <div class="form-group">
+                                        <label for="prod-price">PREÇO (R$) *</label>
+                                        <input type="number" id="prod-price" placeholder="89.90" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prod-quantity">ESTOQUE INICIAL *</label>
+                                        <input type="number" id="prod-quantity" placeholder="15" min="0" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label for="prod-desc">DESCRIÇÃO</label>
+                                    <textarea id="prod-desc" style="height: 80px; resize: none;" placeholder="Descreva sabor e características..."></textarea>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 20px;">
+                                    <label>IMAGEM DO PRODUTO</label>
+                                    <div class="image-upload-wrapper" id="image-upload-area">
+                                        <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+                                        <div class="upload-icon">📷</div>
+                                        <p class="upload-text" id="upload-instruction">Arraste aqui ou <span>clique para buscar</span></p>
+                                        <img src="" alt="Preview" class="image-preview" id="image-preview-el" style="display: none;">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="pixel-btn success-glow" style="width: 100%;" id="btn-add-product">CADASTRAR PRODUTO</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Right Column: Products List & Stock Manager -->
+                        <div class="admin-list-card pixel-border-single">
+                            <h2 class="section-title">> GERENCIAMENTO DE ESTOQUE</h2>
+                            
+                            <div class="table-responsive">
+                                <table class="pixel-table">
+                                    <thead>
+                                        <tr>
+                                            <th>PRODUTO</th>
+                                            <th>MODELO</th>
+                                            <th>PREÇO</th>
+                                            <th style="width: 150px;">ESTOQUE</th>
+                                            <th style="text-align: center;">AÇÕES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-products-table-body">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 6: CADASTRAR NOVO ADMIN -->
+                <section id="tab-config" class="tab-panel">
+                    <div class="form-container pixel-border-single">
+                        <h2 class="section-title">> CADASTRAR NOVO ADMINISTRADOR</h2>
+                        <form id="register-admin-form" autocomplete="off">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="reg-username">NOME DE USUÁRIO *</label>
+                                    <input type="text" id="reg-username" placeholder="Ex: joao_admin" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reg-password">SENHA *</label>
+                                    <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="pixel-btn success-glow">CADASTRAR ADMIN</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </main>
+
+            <!-- SIDEBAR DE ESTATÍSTICAS E VALORES (Direita) -->
+            <aside class="dash-sidebar">
+                <!-- Bloco 1: Estatísticas Gerais -->
+                <div class="sidebar-card pixel-border-single">
+                    <h3 class="sidebar-card-title">FATURAMENTO GERAL</h3>
+                    <div class="sidebar-stat-item">
+                        <span class="stat-label">À VISTA:</span>
+                        <span id="stat-cash-total" class="stat-value text-green">R$ 0,00</span>
+                    </div>
+                    <div class="sidebar-stat-item">
+                        <span class="stat-label">FIADO ATIVO:</span>
+                        <span id="stat-credit-total" class="stat-value text-yellow">R$ 0,00</span>
+                    </div>
+                    <div class="sidebar-stat-item">
+                        <span class="stat-label">ALERTA HOJE:</span>
+                        <span id="stat-due-today" class="stat-value text-red blink">0</span>
+                    </div>
+                </div>
+
+                <!-- Bloco 2: Balanço dos Sócios -->
+                <div class="sidebar-card pixel-border-single">
+                    <h3 class="sidebar-card-title">SALDO DOS SÓCIOS</h3>
+                    
+                    <div class="sidebar-partner-item">
+                        <span class="partner-stat-label">LIPE</span>
+                        <div class="partner-val-box">
+                            <span id="partner-total-lipe" class="partner-stat-value text-green">R$ 0,00</span>
+                            <span id="partner-credit-lipe" class="partner-stat-sub">(Fiado: R$ 0,00)</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-partner-item">
+                        <span class="partner-stat-label">ANNA</span>
+                        <div class="partner-val-box">
+                            <span id="partner-total-anna" class="partner-stat-value text-green">R$ 0,00</span>
+                            <span id="partner-credit-anna" class="partner-stat-sub">(Fiado: R$ 0,00)</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-partner-item">
+                        <span class="partner-stat-label">LEON</span>
+                        <div class="partner-val-box">
+                            <span id="partner-total-leon" class="partner-stat-value text-green">R$ 0,00</span>
+                            <span id="partner-credit-leon" class="partner-stat-sub">(Fiado: R$ 0,00)</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE VENDA -->
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content pixel-border-double">
+            <h2 class="section-title">> EDITAR REGISTRO DE VENDA</h2>
+            <form id="edit-form" autocomplete="off">
+                <input type="hidden" id="edit-sale-id">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-name">NOME DO PRODUTO *</label>
+                        <input type="text" id="edit-product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-price">VALOR DO PRODUTO (R$) *</label>
+                        <input type="number" id="edit-product-price" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-customer-name">NOME DO CLIENTE *</label>
+                        <input type="text" id="edit-customer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-customer-contact">CONTATO</label>
+                        <input type="text" id="edit-customer-contact">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-shipping-fee">VALOR DO FRETE (R$)</label>
+                        <input type="number" id="edit-shipping-fee" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-partner-select">SÓCIO *</label>
+                        <select id="edit-partner-select" required>
+                            <option value="Lipe">Lipe</option>
+                            <option value="Anna">Anna</option>
+                            <option value="Leon">Leon</option>
+                        </select>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="pixel-checkbox-label">
+                            <input type="checkbox" id="edit-is-credit">
+                            <span class="custom-checkbox"></span>
+                            VENDA FIADA?
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Campos de crédito editáveis -->
+                <div id="edit-credit-inputs" class="form-row-credit-modal hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-due-date">DATA DE PAGAMENTO *</label>
+                            <input type="date" id="edit-due-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-interest-rate">JUROS (%)</label>
+                            <input type="number" id="edit-interest-rate" min="0" max="100">
+                            <div id="edit-live-total-preview" class="live-preview-box">
+                                Total com Juros: <span id="edit-live-total-value">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="pixel-btn success-glow">SALVAR ALTERAÇÕES</button>
+                    <button type="button" id="btn-cancel-edit" class="pixel-btn-danger">CANCELAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast-container hidden">
+        <span id="toast-message">Notificação</span>
+    </div>
+
+    <!-- AUDIO EFFECTS -->
+    <audio id="sound-success" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav" preload="auto"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+
+    <!-- SCRIPTS -->
+    <script src="/js/app.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga Pods - A sua loja de Pods Descartáveis</title>
+    <meta name="description" content="Liga Pods é a maior loja de pods descartáveis com envio rápido, garantia e o melhor preço do mercado.">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/index.html" class="brand" id="brand-logo">
+                <img src="/img/logo.png" alt="Liga Pods" class="brand-logo-img">
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="/index.html" class="nav-link active" id="nav-home">Início</a></li>
+                <li><a href="/products.html" class="nav-link" id="nav-disposables">Pods Descartáveis</a></li>
+                <li><a href="/cart.html" class="nav-link" id="nav-cart-link">Carrinho</a></li>
+            </ul>
+            
+            <div class="nav-actions" id="nav-actions">
+                <a href="/cart.html" class="cart-btn" id="cart-button">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Carrinho</span>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="/login.html" class="admin-login-btn" id="login-nav-btn">Entrar como Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-badge">Originalidade Garantida</div>
+            <h1 id="hero-heading">Liga Pods</h1>
+            <p id="hero-description">A melhor experiência em vaporizadores descartáveis. Escolha entre marcas premium, sabores intensos e a durabilidade que você procura.</p>
+            <a href="/products.html" class="btn-primary" id="cta-shop-now">Explorar Loja</a>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="categories-section">
+            <div class="section-header">
+                <h2 class="section-title" id="categories-heading">Categorias</h2>
+            </div>
+            
+            <div class="category-grid">
+                <div class="category-card" onclick="window.location.href='/products.html'" id="category-disposable-card">
+                    <div class="category-icon">💨</div>
+                    <h3 class="category-name">Pods Descartáveis</h3>
+                    <p class="category-desc">Aparelhos prontos para uso, sem necessidade de recarga de líquido. Praticidade extrema.</p>
+                    <span class="category-arrow">➔</span>
+                </div>
+                
+                <div class="category-card" style="opacity: 0.6; cursor: not-allowed;" id="category-coming-soon-card">
+                    <div class="category-icon">⚡</div>
+                    <h3 class="category-name">Acessórios & Coils</h3>
+                    <p class="category-desc">Em breve: Carregadores, cases e muito mais para personalizar sua sessão.</p>
+                    <span class="category-arrow" style="color: var(--text-muted);">➔</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="products-container">
+            <div class="section-header">
+                <h2 class="section-title" id="featured-products-heading">Destaques da Loja</h2>
+                <a href="/products.html" class="nav-link" id="view-all-products-link">Ver todos ➔</a>
+            </div>
+            
+            <div class="products-grid" id="featured-products-grid">
+                <!-- Will be loaded dynamically using home.js -->
+                <div class="empty-state" style="grid-column: 1 / -1;" id="loading-featured-state">
+                    <p>Carregando produtos em destaque...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Liga Pods. Todos os direitos reservados. Venda proibida para menores de 18 anos.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/app.js"></script>
+    <script src="/js/home.js"></script>
+</body>
+</html>

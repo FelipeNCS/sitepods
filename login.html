@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Administrativo - Liga Pods</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/index.html" class="brand" id="brand-logo">
+                <img src="/img/logo.png" alt="Liga Pods" class="brand-logo-img">
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="/index.html" class="nav-link" id="nav-home">Início</a></li>
+                <li><a href="/products.html" class="nav-link" id="nav-disposables">Pods Descartáveis</a></li>
+                <li><a href="/cart.html" class="nav-link" id="nav-cart-link">Carrinho</a></li>
+            </ul>
+            
+            <div class="nav-actions" id="nav-actions">
+                <a href="/cart.html" class="cart-btn" id="cart-button">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Carrinho</span>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="/login.html" class="admin-login-btn active" id="login-nav-btn">Entrar como Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="login-container">
+            <div class="glass-form-card">
+                <h1 class="form-title" id="login-title">Área do Admin</h1>
+                <p class="form-subtitle" id="login-subtitle">Faça login para gerenciar o estoque e adicionar produtos.</p>
+                
+                <!-- Authentication Error Alert -->
+                <div class="form-alert" id="auth-alert">Usuário ou senha incorretos!</div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Usuário</label>
+                        <input type="text" id="username" class="form-input" placeholder="Seu usuário" required autocomplete="username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" id="password" class="form-input" placeholder="Sua senha" required autocomplete="current-password">
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" id="btn-login-submit">Entrar</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Liga Pods. Todos os direitos reservados. Venda proibida para menores de 18 anos.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/app.js"></script>
+    <script src="/js/login.js"></script>
+</body>
+</html>

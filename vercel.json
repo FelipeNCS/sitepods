@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/products/models", "destination": "/api/products.js?action=models" },
+    { "source": "/api/admin/products/:id/stock", "destination": "/api/admin/products.js?id=:id&action=stock" },
+    { "source": "/api/admin/products/:id", "destination": "/api/admin/products.js?id=:id" },
+    { "source": "/api/admin/sales/:id", "destination": "/api/admin/sales.js?id=:id" }
+  ]
+}

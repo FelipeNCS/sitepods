@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pods Descartáveis - Liga Pods</title>
+    <meta name="description" content="Explore nossa coleção completa de pods descartáveis de alta qualidade na Liga Pods.">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/index.html" class="brand" id="brand-logo">
+                <img src="/img/logo.png" alt="Liga Pods" class="brand-logo-img">
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="/index.html" class="nav-link" id="nav-home">Início</a></li>
+                <li><a href="/products.html" class="nav-link active" id="nav-disposables">Pods Descartáveis</a></li>
+                <li><a href="/cart.html" class="nav-link" id="nav-cart-link">Carrinho</a></li>
+            </ul>
+            
+            <div class="nav-actions" id="nav-actions">
+                <a href="/cart.html" class="cart-btn" id="cart-button">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Carrinho</span>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="/login.html" class="admin-login-btn" id="login-nav-btn">Entrar como Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="products-container">
+            <div class="section-header">
+                <h1 class="section-title" id="page-title">Pods Descartáveis</h1>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+                <span class="filter-label">Modelos / Marcas:</span>
+                <div class="filter-tabs" id="filter-tabs-container">
+                    <button class="filter-tab active" data-model="todos" id="tab-todos">Todos</button>
+                    <button class="filter-tab" data-model="IGNITE" id="tab-ignite">Ignite</button>
+                    <button class="filter-tab" data-model="BLACKSHEEP" id="tab-blacksheep">Blacksheep</button>
+                    <button class="filter-tab" data-model="ELFBAR" id="tab-elfbar">Elfbar</button>
+                </div>
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be rendered dynamically -->
+                <div class="empty-state" style="grid-column: 1 / -1;" id="loading-products-state">
+                    <p>Carregando pods descartáveis...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Liga Pods. Todos os direitos reservados. Venda proibida para menores de 18 anos.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/app.js"></script>
+    <script src="/js/products.js"></script>
+</body>
+</html>

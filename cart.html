@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Carrinho - Liga Pods</title>
+    <meta name="description" content="Confira os itens no seu carrinho de compras e finalize o seu pedido via WhatsApp.">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/index.html" class="brand" id="brand-logo">
+                <img src="/img/logo.png" alt="Liga Pods" class="brand-logo-img">
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="/index.html" class="nav-link" id="nav-home">Início</a></li>
+                <li><a href="/products.html" class="nav-link" id="nav-disposables">Pods Descartáveis</a></li>
+                <li><a href="/cart.html" class="nav-link active" id="nav-cart-link">Carrinho</a></li>
+            </ul>
+            
+            <div class="nav-actions" id="nav-actions">
+                <a href="/cart.html" class="cart-btn" id="cart-button">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Carrinho</span>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="/login.html" class="admin-login-btn" id="login-nav-btn">Entrar como Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="cart-container">
+            <div class="section-header">
+                <h1 class="section-title" id="page-title">Meu Carrinho</h1>
+            </div>
+            
+            <div class="cart-layout" id="cart-layout">
+                <!-- Left side: Cart items list -->
+                <div class="cart-items-list" id="cart-items-list">
+                    <!-- Items will be loaded dynamically -->
+                </div>
+                
+                <!-- Right side: Order Summary -->
+                <div class="cart-summary" id="cart-summary-panel">
+                    <h2 class="summary-title" id="summary-panel-title">Resumo do Pedido</h2>
+                    
+                    <div class="summary-row">
+                        <span>Produtos</span>
+                        <span id="summary-items-qty">0 itens</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Entrega</span>
+                        <span style="color: var(--success); font-weight: 500;">A combinar</span>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="summary-total-price">R$ 0,00</span>
+                    </div>
+                    
+                    <button class="btn-checkout" id="checkout-whatsapp-btn">
+                        <!-- WhatsApp SVG -->
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 1.981 14.114.957 11.492.957c-5.435 0-9.858 4.37-9.862 9.8-.001 1.716.463 3.39 1.343 4.883l-.974 3.56 3.648-.946zm11.367-7.467c-.29-.145-1.71-.844-1.973-.939-.264-.096-.456-.145-.647.145-.192.29-.74.939-.908 1.129-.168.19-.335.213-.625.068-1.21-.606-2.128-1.066-2.958-2.484-.22-.374.22-.347.63-.177.368.15.29.145.456.452.167.31.083.585-.041.834-.124.25-.647 1.562-.79 1.902-.143.34-.286.29-.576.145-.29-.145-1.22-.449-2.327-1.434-.86-.764-1.44-1.71-1.607-1.998-.168-.29-.018-.445.127-.589.13-.13.29-.339.435-.508.145-.169.19-.29.29-.484.096-.193.048-.362-.024-.508-.073-.145-.647-1.562-.887-2.143-.234-.564-.469-.488-.647-.497-.168-.008-.36-.01-.553-.01-.193 0-.507.073-.77.362-.263.29-1.007.984-1.007 2.398 0 1.415 1.031 2.783 1.175 2.977.145.195 2.03 3.093 4.916 4.33.687.295 1.223.472 1.64.604.69.219 1.319.19 1.815.116.552-.083 1.71-.698 1.95-1.372.24-.674.24-1.253.168-1.372-.07-.12-.26-.192-.55-.337z"/>
+                        </svg>
+                        <span>Finalizar via WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Liga Pods. Todos os direitos reservados. Venda proibida para menores de 18 anos.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/app.js"></script>
+    <script src="/js/cart.js"></script>
+</body>
+</html>
