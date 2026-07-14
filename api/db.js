@@ -57,7 +57,26 @@ async function ensureTablesExist() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         `);
 
-        // 4. Cadastrar o administrador inicial se a tabela estiver vazia
+        // 4. Criar tabela de pedidos do WhatsApp
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS whatsapp_orders (
+                id BIGINT PRIMARY KEY,
+                items TEXT NOT NULL,
+                total DECIMAL(10,2) NOT NULL,
+                status VARCHAR(50) DEFAULT 'pending',
+                created_at VARCHAR(100) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+
+        // 5. Criar tabela de configurações do site
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS site_settings (
+                setting_key VARCHAR(100) PRIMARY KEY,
+                setting_value TEXT NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+
+        // 6. Cadastrar o administrador inicial se a tabela estiver vazia
         const [rows] = await connection.query('SELECT COUNT(*) as count FROM admins');
         if (rows[0].count === 0) {
             await connection.query(
@@ -65,6 +84,17 @@ async function ensureTablesExist() {
                 ['felipencs', '01102030']
             );
             console.log('Administrador inicial felipencs cadastrado.');
+        }
+
+        // 7. Cadastrar configurações iniciais do site se vazia
+        const [rowsSettings] = await connection.query('SELECT COUNT(*) as count FROM site_settings');
+        if (rowsSettings[0].count === 0) {
+            await connection.query(
+                `INSERT INTO site_settings (setting_key, setting_value) VALUES 
+                 ('promo_active', '0'),
+                 ('promo_text', '🔥 PROMOÇÃO ROLANDO! Desconto especial em compras no atacado!')`
+            );
+            console.log('Configurações iniciais do site cadastradas.');
         }
 
         connection.release();

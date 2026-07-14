@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
         await ensureTablesExist();
 
         if (req.method === 'POST') {
-            const { username, password } = req.body;
+            const { username, password, rememberMe } = req.body;
 
             if (!username || !password) {
                 res.status(400).json({ error: 'Preencha usuário e senha.' });
@@ -26,7 +26,8 @@ module.exports = async (req, res) => {
 
             if (rows.length > 0 && rows[0].password === password) {
                 // Configura o Cookie de sessão HTTP-Only seguro para a Vercel
-                res.setHeader('Set-Cookie', `adminUser=${username.trim()}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`);
+                const maxAge = rememberMe ? 2592000 : 86400; // 30 dias ou 1 dia
+                res.setHeader('Set-Cookie', `adminUser=${username.trim()}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`);
                 res.status(200).json({ message: 'Login realizado com sucesso.' });
             } else {
                 res.status(401).json({ error: 'Usuário ou senha incorretos.' });

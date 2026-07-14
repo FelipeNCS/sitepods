@@ -127,6 +127,8 @@ function checkoutToWhatsApp() {
     message += `-------------------------------------------\n`;
 
     let total = 0;
+    const itemsList = [];
+    
     cart.forEach((item, idx) => {
         const sub = item.price * item.qty;
         total += sub;
@@ -134,11 +136,31 @@ function checkoutToWhatsApp() {
         message += `   Modelo: ${item.model || 'N/A'}\n`;
         message += `   Qtd: ${item.qty}x de R$ ${item.price.toFixed(2)}\n`;
         message += `   Subtotal: R$ ${sub.toFixed(2)}\n\n`;
+        
+        itemsList.push({
+            name: item.name,
+            model: item.model,
+            price: item.price,
+            qty: item.qty
+        });
     });
 
     message += `-------------------------------------------\n`;
     message += `*Total do Pedido: R$ ${total.toFixed(2)}*\n\n`;
     message += `Forma de entrega e pagamento a combinar. Aguardo retorno!`;
+
+    // Salvar pedido no banco de dados para gerar Alerta de Venda no admin
+    const orderPayload = {
+        id: Date.now(),
+        items: JSON.stringify(itemsList),
+        total: total
+    };
+
+    fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+    }).catch(err => console.error('Erro ao salvar pedido no banco:', err));
 
     // Encode message for URL
     const encodedText = encodeURIComponent(message);

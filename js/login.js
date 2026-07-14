@@ -1,6 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     checkLoggedRedirect();
 
+    // Prefill remembered username
+    const rememberedUser = localStorage.getItem('rememberedAdminUser');
+    const usernameInput = document.getElementById('username');
+    const rememberMeCheckbox = document.getElementById('remember-me');
+    if (rememberedUser && usernameInput) {
+        usernameInput.value = rememberedUser;
+        if (rememberMeCheckbox) {
+            rememberMeCheckbox.checked = true;
+        }
+    }
+
     const form = document.getElementById('login-form');
     if (form) {
         form.addEventListener('submit', handleLogin);
@@ -27,14 +38,25 @@ async function handleLogin(e) {
     
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
+    const rememberMeCheckbox = document.getElementById('remember-me');
     const alertBox = document.getElementById('auth-alert');
     
     if (!usernameInput || !passwordInput) return;
     
+    const usernameVal = usernameInput.value.trim();
+    const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+    
     const payload = {
-        username: usernameInput.value.trim(),
-        password: passwordInput.value
+        username: usernameVal,
+        password: passwordInput.value,
+        rememberMe: rememberMe
     };
+
+    if (rememberMe) {
+        localStorage.setItem('rememberedAdminUser', usernameVal);
+    } else {
+        localStorage.removeItem('rememberedAdminUser');
+    }
 
     if (alertBox) alertBox.style.display = 'none';
 

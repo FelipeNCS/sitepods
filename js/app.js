@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartCountBadge();
     checkNavbarAdminState();
     initFireParticles();
+    loadPromoBanner();
 });
 
 // Red Fire Particle System (Canvas Background - Pixel Art / Low Res)
@@ -228,6 +229,87 @@ function initFireParticles() {
     }
 
     animate();
+}
+
+async function loadPromoBanner() {
+    try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+            const settings = await response.json();
+            if (settings.promo_active === '1' && settings.promo_text) {
+                renderPromoBanner(settings.promo_text);
+            }
+        }
+    } catch (e) {
+        console.error('Falha ao carregar banners promocionais:', e);
+    }
+}
+
+function renderPromoBanner(text) {
+    if (document.getElementById('site-promo-banner')) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'site-promo-banner';
+    banner.style.background = 'linear-gradient(90deg, #7c3aed 0%, #06b6d4 50%, #7c3aed 100%)';
+    banner.style.backgroundSize = '200% auto';
+    banner.style.color = '#ffffff';
+    banner.style.textAlign = 'center';
+    banner.style.padding = '10px 20px';
+    banner.style.fontSize = '14px';
+    banner.style.fontWeight = 'bold';
+    banner.style.letterSpacing = '1px';
+    banner.style.textTransform = 'uppercase';
+    banner.style.position = 'relative';
+    banner.style.zIndex = '1001';
+    banner.style.boxShadow = '0 2px 10px rgba(124, 58, 237, 0.4)';
+    banner.style.animation = 'promoGrad 4s linear infinite, promoPulse 1.5s ease-in-out infinite alternate';
+    banner.style.fontFamily = 'var(--font-primary)';
+    
+    banner.innerHTML = `
+        <span style="display: inline-block; vertical-align: middle; margin-right: 8px;">🔥</span>
+        <span style="vertical-align: middle;">${text}</span>
+        <button id="close-promo-btn" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #fff; font-size: 16px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;">✕</button>
+    `;
+
+    // Append CSS animations
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = `
+        @keyframes promoGrad {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes promoPulse {
+            from { box-shadow: 0 2px 8px rgba(6, 182, 212, 0.4); }
+            to { box-shadow: 0 2px 15px rgba(124, 58, 237, 0.6); }
+        }
+        #site-promo-banner button:hover {
+            opacity: 1 !important;
+            transform: translateY(-50%) scale(1.1) !important;
+        }
+    `;
+    document.head.appendChild(styleEl);
+
+    // Insert at the top of body
+    document.body.insertBefore(banner, document.body.firstChild);
+    
+    // Adjust header and body padding
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.top = banner.offsetHeight + 'px';
+        document.body.style.paddingTop = banner.offsetHeight + 'px';
+    }
+
+    const closeBtn = banner.querySelector('#close-promo-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            banner.remove();
+            if (header) {
+                header.style.top = '0';
+                document.body.style.paddingTop = '0';
+            }
+        });
+    }
 }
 
 

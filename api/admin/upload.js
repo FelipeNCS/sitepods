@@ -53,3 +53,9 @@ module.exports = async (req, res) => {
         res.status(500).json({ error: 'Falha ao processar arquivo de imagem.' });
     }
 };
+
+module.exports.config = {
+    api: {
+        bodyParser: false
+    }
+};

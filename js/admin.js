@@ -9,12 +9,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicialização de Dados
     loadSales();
     loadProducts();
+    loadWhatsAppOrders();
 
     // Sincronização periódica a cada 10 segundos
     setInterval(() => {
         loadSales(true); // silent load
         loadProducts(true); // silent load
+        loadWhatsAppOrders(true); // silent load
     }, 10000);
+
+    // Ouvintes para o Modal de Pedidos WhatsApp
+    const salesAlertBox = document.getElementById('stat-sales-alert-box');
+    const whatsappModal = document.getElementById('whatsapp-orders-modal');
+    const btnCloseWhatsappModal = document.getElementById('btn-close-whatsapp-modal');
+
+    if (salesAlertBox && whatsappModal) {
+        salesAlertBox.addEventListener('click', () => {
+            loadWhatsAppOrders();
+            whatsappModal.classList.remove('hidden');
+        });
+    }
+    if (btnCloseWhatsappModal && whatsappModal) {
+        btnCloseWhatsappModal.addEventListener('click', () => {
+            whatsappModal.classList.add('hidden');
+        });
+    }
 
     // --- FORMULÁRIOS EVENT LISTENERS ---
     
@@ -40,6 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerAdminForm = document.getElementById('register-admin-form');
     if (registerAdminForm) {
         registerAdminForm.addEventListener('submit', handleRegisterAdmin);
+    }
+
+    // Salvar Promoção do Site
+    const sitePromoForm = document.getElementById('site-promo-form');
+    if (sitePromoForm) {
+        sitePromoForm.addEventListener('submit', handleSavePromo);
     }
 
     // Drag and Drop Upload Area para Imagens de Pods
@@ -99,6 +124,15 @@ let sales = [];
 let storefrontProducts = [];
 let selectedImageFile = null;
 
+function normalizePartnerName(name) {
+    if (!name) return 'Lipe';
+    const clean = name.trim().toLowerCase();
+    if (clean === 'lipe') return 'Lipe';
+    if (clean === 'anna') return 'Anna';
+    if (clean === 'leon') return 'Leon';
+    return 'Lipe';
+}
+
 // === SEÇÃO 1: VERIFICAÇÃO DE SESSÃO ===
 async function checkAdminSession() {
     try {
@@ -124,8 +158,48 @@ function initTabs() {
             tab.classList.add('active');
             const targetTab = tab.getAttribute('data-tab');
             document.getElementById(targetTab).classList.add('active');
+
+            // Swap sidebars if Configuration tab is selected
+            const defaultSidebar = document.getElementById('default-sidebar');
+            const configSidebar = document.getElementById('config-sidebar');
+            if (defaultSidebar && configSidebar) {
+                if (targetTab === 'tab-produtos') {
+                    defaultSidebar.classList.add('hidden');
+                    configSidebar.classList.remove('hidden');
+                    
+                    // Trigger click on Cadastrar Produto default subpanel option
+                    const btnOptProd = document.getElementById('btn-opt-produtos');
+                    if (btnOptProd) btnOptProd.click();
+                } else {
+                    defaultSidebar.classList.remove('hidden');
+                    configSidebar.classList.add('hidden');
+                }
+            }
         });
     });
+
+    // Wire up site settings option buttons
+    const btnOptProd = document.getElementById('btn-opt-produtos');
+    const btnOptPromo = document.getElementById('btn-opt-promocao');
+    const subpanelProd = document.getElementById('subpanel-produtos');
+    const subpanelPromo = document.getElementById('subpanel-promocao');
+
+    if (btnOptProd && btnOptPromo && subpanelProd && subpanelPromo) {
+        btnOptProd.addEventListener('click', () => {
+            btnOptProd.classList.add('active');
+            btnOptPromo.classList.remove('active');
+            subpanelProd.classList.remove('hidden');
+            subpanelPromo.classList.add('hidden');
+        });
+
+        btnOptPromo.addEventListener('click', () => {
+            btnOptPromo.classList.add('active');
+            btnOptProd.classList.remove('active');
+            subpanelPromo.classList.remove('hidden');
+            subpanelProd.classList.add('hidden');
+            loadPromoSettings(); // load promo configuration on demand
+        });
+    }
 }
 
 // === SEÇÃO 3: EFEITO VISUAL DE JUROS (PREVIEW) ===
@@ -233,9 +307,25 @@ async function loadSales(silent = false) {
         
         renderSalesTables();
         updateDashboardStats();
+        updateCustomersDatalist();
     } catch (e) {
         if (!silent) showToast('Falha ao obter histórico de vendas.', 'error');
     }
+}
+
+function updateCustomersDatalist() {
+    const datalist = document.getElementById('customers-datalist');
+    if (!datalist) return;
+    
+    // Get unique customer names from sales
+    const uniqueCustomers = Array.from(new Set(sales.map(s => (s.customer || '').trim()).filter(Boolean)));
+    
+    datalist.innerHTML = '';
+    uniqueCustomers.sort().forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        datalist.appendChild(opt);
+    });
 }
 
 function renderSalesTables() {
@@ -435,7 +525,7 @@ async function handleAddSale(e) {
     const customer = document.getElementById('customer-name').value.trim();
     const contact = document.getElementById('customer-contact').value.trim();
     const shipping = parseFloat(document.getElementById('shipping-fee').value) || 0;
-    const partner = document.getElementById('partner-select').value;
+    const partner = normalizePartnerName(document.getElementById('partner-select').value);
     const isCredit = document.getElementById('is-credit').checked;
     
     let dueDate = '';
@@ -446,18 +536,25 @@ async function handleAddSale(e) {
         interestRate = parseFloat(document.getElementById('interest-rate').value) || 0;
     }
 
+    // Normalize customer name casing using existing sales list
+    let normalizedCustomer = customer;
+    const existingSale = sales.find(s => s.customer && s.customer.trim().toLowerCase() === customer.toLowerCase());
+    if (existingSale) {
+        normalizedCustomer = existingSale.customer.trim();
+    }
+
     const payload = {
         id: Date.now(), // ID do timestamp
         product,
         price,
-        customer,
+        customer: normalizedCustomer,
         contact,
         shipping,
         partner,
         isCredit,
         dueDate,
         interestRate,
-        isPaid: false,
+        isPaid: !isCredit,
         saleDate: new Date().toLocaleString('pt-BR')
     };
 
@@ -580,7 +677,7 @@ async function handleSaveEditSale(e) {
     const customer = document.getElementById('edit-customer-name').value.trim();
     const contact = document.getElementById('edit-customer-contact').value.trim();
     const shipping = parseFloat(document.getElementById('edit-shipping-fee').value) || 0;
-    const partner = document.getElementById('edit-partner-select').value;
+    const partner = normalizePartnerName(document.getElementById('edit-partner-select').value);
     const isCredit = document.getElementById('edit-is-credit').checked;
     
     let dueDate = '';
@@ -591,17 +688,25 @@ async function handleSaveEditSale(e) {
         interestRate = parseFloat(document.getElementById('edit-interest-rate').value) || 0;
     }
 
+    // Normalize customer name casing using existing sales list
+    let normalizedCustomer = customer;
+    const existingSale = sales.find(s => s.customer && s.customer.trim().toLowerCase() === customer.toLowerCase() && s.id != id);
+    if (existingSale) {
+        normalizedCustomer = existingSale.customer.trim();
+    }
+
     const payload = {
         ...originalSale,
         product,
         price,
-        customer,
+        customer: normalizedCustomer,
         contact,
         shipping,
         partner,
         isCredit,
         dueDate,
-        interestRate
+        interestRate,
+        isPaid: !isCredit ? true : originalSale.isPaid
     };
 
     try {
@@ -642,8 +747,9 @@ function updateDashboardStats() {
             // Fiado ativo
             statCredit += total;
             
-            if (partnerStats[s.partner]) {
-                partnerStats[s.partner].credit += total;
+            const partnerKey = normalizePartnerName(s.partner);
+            if (partnerStats[partnerKey]) {
+                partnerStats[partnerKey].credit += total;
             }
 
             // Checar alertas hoje
@@ -655,8 +761,9 @@ function updateDashboardStats() {
             // Venda à vista ou fiado já pago
             statCash += total;
             
-            if (partnerStats[s.partner]) {
-                partnerStats[s.partner].cash += total;
+            const partnerKey = normalizePartnerName(s.partner);
+            if (partnerStats[partnerKey]) {
+                partnerStats[partnerKey].cash += total;
             }
         }
     });
@@ -1085,6 +1192,172 @@ function initSmokeCanvas() {
     }
 
     animate();
+}
+
+// === SEÇÃO 12: PEDIDOS DO WHATSAPP E ALERTAS DE VENDA ===
+let whatsappOrders = [];
+
+async function loadWhatsAppOrders(silent = false) {
+    const tableBody = document.getElementById('table-body-whatsapp-orders');
+    const alertLabel = document.getElementById('stat-sales-alert');
+    if (!tableBody || !alertLabel) return;
+
+    try {
+        const response = await fetch('/api/admin/orders');
+        if (!response.ok) throw new Error();
+        whatsappOrders = await response.json();
+
+        // Update alert counter
+        alertLabel.textContent = whatsappOrders.length;
+        if (whatsappOrders.length > 0) {
+            alertLabel.classList.add('blink');
+        } else {
+            alertLabel.classList.remove('blink');
+        }
+
+        // Render modal table rows
+        if (whatsappOrders.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center">Nenhum pedido pendente.</td></tr>`;
+        } else {
+            tableBody.innerHTML = '';
+            whatsappOrders.forEach(order => {
+                const tr = document.createElement('tr');
+                tr.id = `whatsapp-order-row-${order.id}`;
+
+                let itemsSummary = '';
+                try {
+                    const items = JSON.parse(order.items);
+                    itemsSummary = items.map(item => `${item.qty}x ${item.name}`).join(', ');
+                } catch (e) {
+                    itemsSummary = order.items;
+                }
+
+                // Escape double quotes for JSON payload parameter
+                const itemsEscaped = order.items.replace(/"/g, '&quot;');
+
+                tr.innerHTML = `
+                    <td>${order.createdAt}</td>
+                    <td style="font-weight:700;">${itemsSummary}</td>
+                    <td class="text-green" style="font-weight:700;">R$ ${order.total.toFixed(2)}</td>
+                    <td style="text-align: center;">
+                        <button class="pixel-btn success-glow" onclick="registerSaleFromOrder('${order.id}', '${itemsEscaped}', ${order.total})" title="Converter em Venda" style="padding: 4px 8px; margin-right: 5px;">📦</button>
+                        <button class="pixel-btn-danger" onclick="deleteWhatsAppOrder('${order.id}')" title="Excluir Pedido" style="padding: 4px 8px;">❌</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+    } catch (e) {
+        if (!silent) console.error('Erro ao buscar pedidos do WhatsApp', e);
+    }
+}
+
+async function deleteWhatsAppOrder(orderId, silent = false) {
+    if (!silent && !confirm('Deseja excluir definitivamente este pedido do WhatsApp?')) return;
+
+    try {
+        const response = await fetch(`/api/admin/orders/${orderId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            if (!silent) showToast('Pedido removido com sucesso!', 'success');
+            loadWhatsAppOrders(true);
+        } else {
+            if (!silent) showToast('Falha ao remover pedido.', 'error');
+        }
+    } catch (err) {
+        if (!silent) showToast('Erro de rede.', 'error');
+    }
+}
+
+function registerSaleFromOrder(orderId, itemsArrayOrStr, total) {
+    let productName = '';
+    try {
+        if (Array.isArray(itemsArrayOrStr)) {
+            productName = itemsArrayOrStr.map(item => `${item.qty}x ${item.name}`).join(' + ');
+        } else if (typeof itemsArrayOrStr === 'string') {
+            const parsed = JSON.parse(itemsArrayOrStr);
+            productName = parsed.map(item => `${item.qty}x ${item.name}`).join(' + ');
+        }
+    } catch (e) {
+        productName = 'Pedido WhatsApp';
+    }
+
+    // Set form fields
+    const productInput = document.getElementById('product-name');
+    const priceInput = document.getElementById('product-price');
+    if (productInput) productInput.value = productName;
+    if (priceInput) {
+        priceInput.value = parseFloat(total).toFixed(2);
+        // Trigger live price calculate preview
+        priceInput.dispatchEvent(new Event('input'));
+    }
+
+    // Close WhatsApp modal
+    const whatsappModal = document.getElementById('whatsapp-orders-modal');
+    if (whatsappModal) whatsappModal.classList.add('hidden');
+
+    // Switch to VENDER POD tab
+    const venderTab = document.querySelector('.nav-tab[data-tab="tab-vender"]');
+    if (venderTab) venderTab.click();
+
+    // Silently remove order from pending database so it doesn't alert anymore
+    deleteWhatsAppOrder(orderId, true);
+}
+
+// Expor funções para chamadas onclick em HTML gerado dinamicamente
+window.deleteWhatsAppOrder = deleteWhatsAppOrder;
+window.registerSaleFromOrder = registerSaleFromOrder;
+
+// === SEÇÃO 13: CONFIGURAÇÕES DE PROMOÇÃO DO SITE ===
+async function loadPromoSettings() {
+    try {
+        const response = await fetch('/api/admin/settings');
+        if (response.ok) {
+            const settings = await response.json();
+            const promoActiveCheckbox = document.getElementById('promo-active-checkbox');
+            const promoTextInput = document.getElementById('promo-text-input');
+            
+            if (promoActiveCheckbox) {
+                promoActiveCheckbox.checked = settings.promo_active === '1';
+            }
+            if (promoTextInput) {
+                promoTextInput.value = settings.promo_text || '';
+            }
+        }
+    } catch (e) {
+        console.error('Falha ao carregar configurações de promoção', e);
+    }
+}
+
+async function handleSavePromo(e) {
+    if (e) e.preventDefault();
+
+    const promoActiveCheckbox = document.getElementById('promo-active-checkbox');
+    const promoTextInput = document.getElementById('promo-text-input');
+    if (!promoActiveCheckbox || !promoTextInput) return;
+
+    const payload = {
+        promo_active: promoActiveCheckbox.checked,
+        promo_text: promoTextInput.value.trim()
+    };
+
+    try {
+        const response = await fetch('/api/admin/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            showToast('Configurações de promoção salvas!', 'success');
+        } else {
+            showToast('Erro ao salvar configurações de promoção.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de rede ao salvar.', 'error');
+    }
 }
 
 // Auxiliar para transferir venda de sócio
