@@ -314,6 +314,13 @@
                             <p class="form-subtitle" style="margin-bottom: 20px; font-family: 'Rajdhani', sans-serif; font-size: 14px; color: var(--text-secondary);">
                                 Configure uma promoção para exibir um alerta elegante no topo do site oficial para os clientes.
                             </p>
+                            <!-- Status da promoção ativa -->
+                            <div id="active-promo-status-card" class="hidden" style="margin-bottom: 20px; padding: 15px; border: 2px solid #00b33c; background: rgba(0, 179, 60, 0.08); border-radius: 4px;">
+                                <div style="font-weight: bold; color: #00ff55; margin-bottom: 8px; font-size: 13px; font-family: 'Orbitron', sans-serif;">📢 PROMOÇÃO ATIVA NO SITE:</div>
+                                <div id="active-promo-text-display" style="font-size: 15px; font-family: 'Rajdhani', sans-serif; color: #fff; margin-bottom: 12px; word-break: break-word; font-weight: 600;">...</div>
+                                <button type="button" id="btn-end-promo" class="pixel-btn-danger" style="width: 100%; padding: 8px 15px; font-size: 11px;">✕ TERMINAR PROMOÇÃO</button>
+                            </div>
+
                             <form id="site-promo-form">
                                 <div class="form-group checkbox-group" style="margin-bottom: 20px;">
                                     <label class="pixel-checkbox-label">

@@ -59,6 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
         sitePromoForm.addEventListener('submit', handleSavePromo);
     }
 
+    // Terminar Promoção do Site (Botão Rápido)
+    const btnEndPromo = document.getElementById('btn-end-promo');
+    if (btnEndPromo) {
+        btnEndPromo.addEventListener('click', handleEndPromo);
+    }
+
     // Drag and Drop Upload Area para Imagens de Pods
     const uploadArea = document.getElementById('image-upload-area');
     const fileInput = document.getElementById('image-file-input');
@@ -1321,12 +1327,25 @@ async function loadPromoSettings() {
             const settings = await response.json();
             const promoActiveCheckbox = document.getElementById('promo-active-checkbox');
             const promoTextInput = document.getElementById('promo-text-input');
+            const activePromoCard = document.getElementById('active-promo-status-card');
+            const activePromoTextDisplay = document.getElementById('active-promo-text-display');
             
+            const isPromoActive = settings.promo_active === '1';
+
             if (promoActiveCheckbox) {
-                promoActiveCheckbox.checked = settings.promo_active === '1';
+                promoActiveCheckbox.checked = isPromoActive;
             }
             if (promoTextInput) {
                 promoTextInput.value = settings.promo_text || '';
+            }
+
+            if (activePromoCard && activePromoTextDisplay) {
+                if (isPromoActive && settings.promo_text) {
+                    activePromoTextDisplay.textContent = settings.promo_text;
+                    activePromoCard.classList.remove('hidden');
+                } else {
+                    activePromoCard.classList.add('hidden');
+                }
             }
         }
     } catch (e) {
@@ -1355,11 +1374,38 @@ async function handleSavePromo(e) {
 
         if (response.ok) {
             showToast('Configurações de promoção salvas!', 'success');
+            loadPromoSettings(); // reload settings to update status display
         } else {
             showToast('Erro ao salvar configurações de promoção.', 'error');
         }
     } catch (err) {
         showToast('Erro de rede ao salvar.', 'error');
+    }
+}
+
+async function handleEndPromo() {
+    if (!confirm('Deseja realmente terminar a promoção atual e remover o banner do site?')) return;
+
+    const payload = {
+        promo_active: false,
+        promo_text: ''
+    };
+
+    try {
+        const response = await fetch('/api/admin/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            showToast('Promoção encerrada com sucesso!', 'success');
+            loadPromoSettings(); // reload to hide status card
+        } else {
+            showToast('Erro ao encerrar promoção.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de rede ao encerrar.', 'error');
     }
 }
 
